@@ -27,15 +27,12 @@
       (dispatch [::fetch-commands! identity])))
 
 (defn fetch-commands!
-  [_ [{:keys [whisper-identity dapp? dapp-url]}]]
+  [_ [{:keys [whisper-identity dapp? dapp-url bot-url]}]]
   (when true
     ;-let [url (get-in db [:chats identity :dapp-url])]
     (cond
-      (= console-chat-id whisper-identity)
-      (dispatch [::validate-hash whisper-identity js-res/console-js])
-
-      (= wallet-chat-id whisper-identity)
-      (dispatch [::validate-hash whisper-identity js-res/wallet-js])
+      (js-res/local-resource? bot-url)
+      (dispatch [::validate-hash whisper-identity (js-res/get-resource bot-url)])
 
       (and dapp? dapp-url)
       (dispatch [::validate-hash whisper-identity js-res/dapp-js])

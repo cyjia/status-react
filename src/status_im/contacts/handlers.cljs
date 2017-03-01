@@ -199,20 +199,23 @@
 (register-handler :load-default-contacts!
   (u/side-effect!
     (fn [{:keys [chats]}]
-      (doseq [[id {:keys [name photo-path public-key add-chat?
-                          dapp? dapp-url dapp-hash]}] js-res/default-contacts]
+      (doseq [[id {:keys [name photo-path public-key add-chat? has-global-command?
+                          dapp? dapp-url dapp-hash bot-url]}] js-res/default-contacts]
         (let [id' (clojure.core/name id)]
           (when-not (chats id')
             (when add-chat?
               (dispatch [:add-chat id' {:name (:en name)}]))
-            (dispatch [:add-contacts [{:whisper-identity id'
-                                       :address          (public-key->address id')
-                                       :name             (:en name)
-                                       :photo-path       photo-path
-                                       :public-key       public-key
-                                       :dapp?            dapp?
-                                       :dapp-url         (:en dapp-url)
-                                       :dapp-hash        dapp-hash}]])))))))
+            (dispatch [:add-contacts
+                       [{:whisper-identity    id'
+                         :address             (public-key->address id')
+                         :name                (:en name)
+                         :photo-path          photo-path
+                         :public-key          public-key
+                         :dapp?               dapp?
+                         :dapp-url            (:en dapp-url)
+                         :bot-url             bot-url
+                         :has-global-command? has-global-command?
+                         :dapp-hash           dapp-hash}]])))))))
 
 (register-handler :add-contacts
   (after save-contacts!)

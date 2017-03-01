@@ -1,8 +1,8 @@
 function browseSuggestions(params, context) {
     var url;
 
-    if (contex["dapp-url"]) {
-        url = contex["dapp-url"];
+    if (context["dapp-url"]) {
+        url = context["dapp-url"];
     }
 
     if (params.url && params.url !== "undefined" && params.url != "") {
@@ -18,7 +18,7 @@ function browseSuggestions(params, context) {
 }
 
 status.command({
-    name: "init",
+    name: "browse",
     title: I18n.t('browse_title'),
     description: I18n.t('browse_description'),
     color: "#ffa500",
