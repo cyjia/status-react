@@ -83,34 +83,37 @@
       [icon :options_gray]
       options]]))
 
+(defn chat-list-item-name [name group-chat? public?]
+  (let [private-group? (and group-chat? (not public?))
+        public-group?  (and group-chat? public?)
+        chat-name      (if (str/blank? name)
+                         (generate-gfy)
+                         (truncate-str name 30))]
+    [view st/name-view
+     (when public-group?
+       [view st/public-group-icon-container
+        [icon :public_group st/public-group-icon]])
+     (when private-group?
+      [view st/private-group-icon-container
+       [icon :private_group st/private-group-icon]])
+     [text {:style st/name-text}
+      (if public-group?
+        (str "#" chat-name)
+        chat-name)]]))
+
 (defn chat-list-item-inner-view [{:keys [chat-id name color last-message
                                          online group-chat contacts public?] :as chat}
                                  edit?]
   (let [last-message (or (first (sort-by :clock-value > (:messages chat)))
                          last-message)
         name         (or (get-contact-translated chat-id :name name)
-                         (generate-gfy))
-        private-group? (and group-chat (not public?))
-        public-group?  (and group-chat public?)]
+                         (generate-gfy))]
     [view st/chat-container
      [view st/chat-icon-container
       [chat-icon-view-chat-list chat-id group-chat name color online]]
      [view st/chat-info-container
       [view st/item-upper-container
-       [view st/name-view
-        (when public-group?
-          [view st/public-group-icon-container
-           [icon :public_group st/public-group-icon]])
-        (when private-group?
-          [view st/private-group-icon-container
-           [icon :private_group st/private-group-icon]])
-        (let [chat-name (if (str/blank? name)
-                          (generate-gfy)
-                          (truncate-str name 30))]
-          [text {:style st/name-text}
-           (if public-group?
-             (str "#" chat-name)
-             chat-name)])]
+       [chat-list-item-name name group-chat public?]
        (when last-message
          [view
           [message-status chat last-message]
