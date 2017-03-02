@@ -78,7 +78,7 @@
 
 (defn options-btn [chat-id]
   (let [options [{:value #(dispatch [:remove-chat chat-id]) :text (label :t/delete-chat)}]]
-    [view st/more-btn
+    [view st/opts-btn
      [context-menu
       [icon :options_gray]
       options]]))

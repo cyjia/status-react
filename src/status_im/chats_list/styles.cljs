@@ -144,6 +144,12 @@
    :alignItems     :center
    :justifyContent :center})
 
+(def opts-btn
+  {:width          24
+   :height         24
+   :alignItems     :center
+   :justifyContent :center})
+
 (def create-icon
   {:fontSize 20
    :height   22
