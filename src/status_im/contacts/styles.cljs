@@ -2,8 +2,8 @@
   (:require [status-im.components.styles :refer [text1-color
                                                  text2-color
                                                  text3-color
+                                                 separator-color
                                                  color-white
-                                                 color-separator
                                                  color-gray2
                                                  color-gray4
                                                  color-blue
@@ -104,7 +104,7 @@
    :flex-direction      :row
    :height              56
    :background-color    color-white
-   :border-bottom-color color-separator
+   :border-bottom-color separator-color
    :border-bottom-width 0.5})
 
 (def option-inner
