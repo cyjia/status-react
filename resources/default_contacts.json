@@ -38,7 +38,17 @@
             "en": "Browse"
         },
         "dapp?": true,
-        "has-global-command?": true,
+        "global-command": {
+            "description":"Launch the browser",
+            "color":"#ffa500",
+            "name":"browse",
+            "params":[{"name":"url","type":"text"}],
+            "type":"command",
+            "title":"Browser",
+            "has-handler":false,
+            "fullscreen":true,
+            "suggestions-trigger":"on-send"
+        },
         "bot-url": "local://browse-bot"
     },
 

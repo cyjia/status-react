@@ -10,45 +10,49 @@
             [status-im.constants :refer [console-chat-id wallet-chat-id]]
             [taoensso.timbre :as log]
             [status-im.utils.homoglyph :as h]
-            [status-im.utils.js-resources :as js-res]))
+            [status-im.utils.js-resources :as js-res]
+            [status-im.chat.sign-up :as sign-up]))
 
 (def commands-js "commands.js")
 
 (defn load-commands!
-  [{:keys [current-chat-id contacts]} [identity]]
+  [{:keys [current-chat-id contacts]} [identity callback]]
   (let [identity (or identity current-chat-id)
         contact  (or (get contacts identity)
-                     {:whisper-identity identity})]
+                     sign-up/console-contact)]
     (when identity
-      (dispatch [::fetch-commands! contact])))
+      (dispatch [::fetch-commands! {:contact  contact
+                                    :callback callback}])))
   ;; todo uncomment
   #_(if-let [{:keys [file]} (commands/get-by-chat-id identity)]
       (dispatch [::parse-commands! identity file])
       (dispatch [::fetch-commands! identity])))
 
 (defn fetch-commands!
-  [_ [{:keys [whisper-identity dapp? dapp-url bot-url]}]]
+  [_ [{{:keys [dapp? dapp-url bot-url]} :contact
+       :as                              params}]]
   (when true
     ;-let [url (get-in db [:chats identity :dapp-url])]
     (cond
       (js-res/local-resource? bot-url)
-      (dispatch [::validate-hash whisper-identity (js-res/get-resource bot-url)])
+      (dispatch [::validate-hash params (js-res/get-resource bot-url)])
 
       (and dapp? dapp-url)
-      (dispatch [::validate-hash whisper-identity js-res/dapp-js])
+      (dispatch [::validate-hash params js-res/dapp-js])
 
       :else
-      (dispatch [::validate-hash whisper-identity js-res/commands-js])
+      (dispatch [::validate-hash params js-res/commands-js])
       #_(http-get (s/join "/" [url commands-js])
 
                   #(dispatch [::validate-hash identity %])
                   #(dispatch [::loading-failed! identity ::file-was-not-found])))))
 
 (defn dispatch-loaded!
-  [db [identity file]]
+  [db [{{:keys [whisper-identity]} :contact
+        :as                        params} file]]
   (if (::valid-hash db)
-    (dispatch [::parse-commands! identity file])
-    (dispatch [::loading-failed! identity ::wrong-hash])))
+    (dispatch [::parse-commands! params file])
+    (dispatch [::loading-failed! whisper-identity ::wrong-hash])))
 
 (defn get-hash-by-identity
   [db identity]
@@ -59,19 +63,24 @@
   ;; todo tbd hashing algorithm
   (hash file))
 
-(defn parse-commands! [_ [identity file]]
-  (status/parse-jail identity file
+(defn parse-commands!
+  [_ [{{:keys [whisper-identity dapp? dapp-url bot-url]} :contact
+       :keys                                             [callback]
+       :as                                               params} file]]
+  (status/parse-jail whisper-identity file
                      (fn [result]
                        (let [{:keys [error result]} (json->clj result)]
                          (log/debug "Error parsing commands: " error result)
                          (if error
-                           (dispatch [::loading-failed! identity ::error-in-jail error])
-                           (if identity
-                             (dispatch [::add-commands identity file result])
+                           (dispatch [::loading-failed! whisper-identity ::error-in-jail error])
+                           (if whisper-identity
+                             (do
+                               (dispatch [::add-commands whisper-identity file result])
+                               (when callback (callback)))
                              (dispatch [::add-all-commands result])))))))
 
 (defn validate-hash
-  [db [identity file]]
+  [db [_ file]]
   (let [valid? true
         ;; todo check
         #_(= (get-hash-by-identity db identity)
@@ -107,7 +116,7 @@
 
 (defn save-commands-js!
   [_ [id file]]
-  (commands/save {:chat-id id :file file}))
+  #_(commands/save {:chat-id id :file file}))
 
 (defn loading-failed!
   [db [id reason details]]
@@ -119,6 +128,13 @@
                           details])]
       (show-popup "Error" m)
       (log/debug m))))
+
+(reg-handler :check-and-load-commands!
+  (u/side-effect!
+    (fn [{:keys [chats]} [identity callback]]
+      (if (get-in chats [identity :commands-loaded])
+        (callback)
+        (dispatch [:load-commands! identity callback])))))
 
 (reg-handler :load-commands! (u/side-effect! load-commands!))
 (reg-handler ::fetch-commands! (u/side-effect! fetch-commands!))

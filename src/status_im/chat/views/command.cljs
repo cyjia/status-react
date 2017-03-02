@@ -16,7 +16,7 @@
     (validator message)
     (pos? (count message))))
 
-(defview command-icon [command]
+(defview command-icon [{:keys [bot] :as command}]
   [icon-width [:get :command-icon-width]]
   [view st/command-container
    [view {:style    (st/command-text-container command)
@@ -24,4 +24,7 @@
                       (let [width (.. event -nativeEvent -layout -width)]
                         (when (not= icon-width width)
                           (dispatch [:set :command-icon-width width]))))}
-    [text {:style st/command-text} (str chat-consts/command-char (:name command))]]])
+    (let [command-char (if bot
+                         chat-consts/bot-char
+                         chat-consts/command-char)]
+      [text {:style st/command-text} (str command-char (:name command))])]])

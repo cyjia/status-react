@@ -1,8 +1,9 @@
 (ns status-im.data-store.realm.schemas.account.v5.core
   (:require [status-im.data-store.realm.schemas.account.v4.chat :as chat]
             [status-im.data-store.realm.schemas.account.v1.chat-contact :as chat-contact]
-            [status-im.data-store.realm.schemas.account.v1.command :as command]
-            [status-im.data-store.realm.schemas.account.v3.contact :as contact]
+            [status-im.data-store.realm.schemas.account.v5.command :as command]
+            [status-im.data-store.realm.schemas.account.v5.command-parameter :as command-parameter]
+            [status-im.data-store.realm.schemas.account.v5.contact :as contact]
             [status-im.data-store.realm.schemas.account.v1.discover :as discover]
             [status-im.data-store.realm.schemas.account.v1.kv-store :as kv-store]
             [status-im.data-store.realm.schemas.account.v4.message :as message]
@@ -16,6 +17,7 @@
 (def schema [chat/schema
              chat-contact/schema
              command/schema
+             command-parameter/schema
              contact/schema
              discover/schema
              kv-store/schema
