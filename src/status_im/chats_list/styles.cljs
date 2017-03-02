@@ -1,6 +1,7 @@
 (ns status-im.chats-list.styles
   (:require [status-im.components.styles :refer [color-white
                                                  color-light-gray
+                                                 color-light-red
                                                  color-blue
                                                  text1-color
                                                  text2-color
@@ -153,6 +154,9 @@
    :height         24
    :alignItems     :center
    :justifyContent :center})
+
+(def delete-chat-text
+  {:color color-light-red})
 
 (def create-icon
   {:fontSize 20
