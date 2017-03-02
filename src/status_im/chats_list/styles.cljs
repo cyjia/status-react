@@ -46,12 +46,16 @@
          (get-in p/platform-specific [:component-styles :chat-list :chat-icon-container])))
 
 (def chat-info-container
-  (merge {:margin-right    16
-          :margin-bottom   13
+  (merge {:margin-bottom   13
           :justify-content :space-between
           :flex            1
           :flex-direction  :column}
          (get-in p/platform-specific [:component-styles :chat-list :chat-info-container])))
+
+(def chat-options-container
+  (merge {:margin-right 16
+          :padding-top  10}
+         (get-in p/platform-specific [:component-styles :chat-list :chat-options-container])))
 
 (def item-upper-container
   {:flex            1

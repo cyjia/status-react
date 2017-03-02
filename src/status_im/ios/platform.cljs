@@ -31,6 +31,7 @@
                            :chat-container               {:height 74}
                            :chat-icon-container          {:height 74}
                            :chat-info-container          {:margin-top 14}
+                           :chat-options-container       {:margin-top 14}
                            :item-lower-container         {:margin-top 6}
                            :chat-name                    {:height 20}
                            :last-message                 {:font-size  15

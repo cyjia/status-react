@@ -114,10 +114,12 @@
      [view st/chat-info-container
       [view st/item-upper-container
        [chat-list-item-name name group-chat public?]
-       (when last-message
+       (when (and (not edit?) last-message)
          [view
           [message-status chat last-message]
           [message-timestamp last-message]])]
       [view st/item-lower-container
        [message-content-text last-message]
-       [unviewed-indicator chat-id]]]]))
+       (when-not edit? [unviewed-indicator chat-id])]]
+     [view st/chat-options-container
+      (when edit? [options-btn chat-id])]]))
