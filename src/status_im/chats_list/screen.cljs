@@ -14,56 +14,42 @@
             [status-im.components.drawer.view :refer [open-drawer]]
             [status-im.components.styles :refer [color-blue]]
             [status-im.components.status-bar :refer [status-bar]]
-            [status-im.components.toolbar.view :refer [toolbar toolbar-with-search]]
-            [status-im.components.toolbar.actions :as act]
+            [status-im.components.toolbar-new.view :refer [toolbar toolbar-with-search]]
+            [status-im.components.toolbar-new.actions :as act]
+            [status-im.components.toolbar-new.styles :as tst]
             [status-im.components.icons.custom-icons :refer [ion-icon]]
             [status-im.components.react :refer [linear-gradient]]
             [status-im.components.sync-state.offline :refer [offline-view]]
             [status-im.components.context-menu :refer [context-menu]]
+            [status-im.components.tabs.styles :refer [tabs-height]]
             [status-im.utils.listview :refer [to-datasource]]
             [status-im.chats-list.views.chat-list-item :refer [chat-list-item]]
-            [status-im.i18n :refer [label]]
-            [status-im.utils.platform :refer [platform-specific ios?]]
             [status-im.chats-list.styles :as st]
-            [status-im.components.toolbar.styles :as tst]
-            [status-im.components.tabs.styles :refer [tabs-height]]))
+            [status-im.i18n :refer [label]]
+            [status-im.utils.platform :refer [platform-specific ios?]]))
 
 (def android-toolbar-popup-options
   [{:text (label :t/edit) :value #(dispatch [:set-in [:chat-list-ui-props :edit?] true])}])
 
 (defn android-toolbar-actions []
-  [view st/toolbar-actions
-   [touchable-highlight
-    {:on-press #(dispatch [:set-in [:toolbar-search :show] true])}
-    [view st/toolbar-btn
-     [icon :search_dark]]]
-   [view st/toolbar-btn
-    [context-menu
-     [icon :options_dark]
-     android-toolbar-popup-options]]])
+  [(act/search #(dispatch [:set-in [:toolbar-search :show] true]))
+   (act/opts android-toolbar-popup-options)])
 
 (def ios-toolbar-popup-options
   [{:text (label :t/edit-chats) :value #(dispatch [:set-in [:chat-list-ui-props :edit?] true])}
    {:text (label :t/search-chats) :value #(dispatch [:set-in [:toolbar-search :show] true])}])
 
 (defn ios-toolbar-actions []
-  [view st/toolbar-actions
-   [view st/toolbar-btn
-    [context-menu
-     [icon :options_dark]
-     ios-toolbar-popup-options]]
-   [touchable-highlight
-    {:on-press #(dispatch [:navigate-to :group-contacts :people])}
-    [view st/toolbar-btn
-     [icon :add]]]])
+  [(act/opts ios-toolbar-popup-options)
+   (act/add #(dispatch [:navigate-to :group-contacts :people]))])
 
 (defn toolbar-view []
-  [toolbar {:style         tst/toolbar-with-search
-            :title          (label :t/chats)
-            :nav-action     (act/hamburger open-drawer)
-            :custom-action  (if ios?
-                              (ios-toolbar-actions)
-                              (android-toolbar-actions))}])
+  [toolbar {:style      tst/toolbar-with-search
+            :title      (label :t/chats)
+            :nav-action (act/hamburger open-drawer)
+            :actions    (if ios?
+                          (ios-toolbar-actions)
+                          (android-toolbar-actions))}])
 
 (defn toolbar-edit []
   [toolbar {:style          tst/toolbar-with-search
